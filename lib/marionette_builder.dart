@@ -293,4 +293,17 @@ class MarionetteBuilder {
 
   String _createClassName(String root, String key) =>
       '${ReCase(root).pascalCase}${ReCase(key).pascalCase}';
+
+  /// Extracts default values from Remote Config JSON and returns a simplified map
+  /// with parameter names as keys and their default values as string values.
+  Map<String, String> extractDefaults(Map<String, dynamic> json) {
+    final simplified = _simplify(json);
+    final result = <String, String>{};
+
+    for (var entry in simplified.entries) {
+      result[entry.key] = entry.value.toString();
+    }
+
+    return result;
+  }
 }

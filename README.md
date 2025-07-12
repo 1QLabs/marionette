@@ -7,6 +7,7 @@ A Dart code generation library that creates type-safe classes from Firebase Remo
 - **Type-safe Firebase Remote Config access**: Generate Dart classes with strongly-typed getters for Remote Config parameters (strings, booleans, numbers)
 - **Hierarchical structure**: Organize Remote Config parameters into nested groups with corresponding class hierarchies
 - **String interpolation**: Built-in support for parameterized Remote Config strings with runtime value substitution
+- **Defaults JSON extraction**: Automatically generates a simplified JSON file with all parameter names and their default values
 - **Command-line interface**: Easy-to-use CLI tool for code generation from Firebase Remote Config schemas
 - **Clean code output**: Generates well-formatted, readable Dart code with proper class structure
 
@@ -15,26 +16,23 @@ A Dart code generation library that creates type-safe classes from Firebase Remo
 The project includes several npm-style scripts defined in `pubspec.yaml`:
 
 ```bash
-# Generate code from example config (prints to stdout)
-dart run --enable-experiment=native-assets scripts:generate
-
 # Test code generation with validation (recommended)
-dart run scripts/test_generation.dart
+dart run test/test_generation.dart
 
-# Generate and save to specific output file
-dart run bin/marionette.dart --template test/example_config.json --name ExampleConfig example_output.dart
+# Generate both Dart code and defaults JSON from example config
+dart run bin/marionette.dart --template test/remote_config.json test/
 
 # Clean generated files
-rm -f example_output.dart example_generated.dart *.g.dart
+rm -f example_output.dart example_generated.dart *.g.dart test/*.g.json
 
 # Run linting
 dart analyze
 
 # Format code
-dart format lib/ bin/ scripts/
+dart format lib/ bin/ test/
 
 # Run all checks (format, lint, test-generate)
-dart format lib/ bin/ scripts/ && dart analyze && dart run scripts/test_generation.dart
+dart format lib/ bin/ test/ && dart analyze && dart run test/test_generation.dart
 ```
 
 ### Testing Code Generation
@@ -54,7 +52,11 @@ This is much more robust than string-based testing as it actually parses the gen
 ### Command Line
 
 ```bash
-dart run marionette --name FirebaseRemoteConfig --input firebase_remote_config.json --output lib/generated/remote_config.dart
+# Generate both Dart code and defaults JSON
+dart run marionette --template firebase_remote_config.json --name FirebaseRemoteConfig lib/generated/
+
+# Generate only Dart code (skip defaults JSON)
+dart run marionette --template firebase_remote_config.json --name FirebaseRemoteConfig --no-defaults lib/generated/
 ```
 
 ### Input JSON Format
@@ -102,6 +104,24 @@ class FirebaseRemoteConfigUi extends Marionette {
     interpolation.eval(getString('welcome_message'), {'username': username});
 }
 ```
+
+### Generated Defaults JSON
+
+Marionette also generates a simplified defaults JSON file containing all parameter names and their default values:
+
+```json
+{
+  "app_name": "My App",
+  "debug_mode": "true",
+  "welcome_message": "Welcome, {username}!"
+}
+```
+
+This defaults JSON is useful for:
+- **Testing**: Mock Remote Config values during development
+- **Documentation**: Quick reference of all available parameters
+- **Fallback values**: Default configuration when Remote Config is unavailable
+- **CI/CD**: Validate parameter consistency across environments
 
 ## Use Cases
 

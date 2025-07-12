@@ -28,6 +28,7 @@ Future<void> main(List<String> arguments) async {
     'debug',
     help: 'Save the remote config template to output directory',
   );
+  parser.addFlag('no-defaults', help: 'Skip generating the defaults JSON file');
 
   ArgResults args;
   try {
@@ -41,7 +42,9 @@ Future<void> main(List<String> arguments) async {
   if (args['help'] == true) {
     print('Usage: marionette [output_directory] [options]');
     print('');
-    print('Generate Dart code from Firebase Remote Config data.');
+    print(
+      'Generate Dart code and defaults JSON from Firebase Remote Config data.',
+    );
     print('');
     print('Arguments:');
     print(
@@ -50,6 +53,13 @@ Future<void> main(List<String> arguments) async {
     print('');
     print('Options:');
     print(parser.usage);
+    print('');
+    print('Examples:');
+    print('  # Generate both Dart code and defaults JSON');
+    print('  marionette --template config.json lib/');
+    print('');
+    print('  # Generate only Dart code (skip defaults JSON)');
+    print('  marionette --template config.json --no-defaults lib/');
     return;
   }
 
@@ -59,6 +69,7 @@ Future<void> main(List<String> arguments) async {
   final versionNumber = args['version-number'] as String?;
   final projectId = args['project'] as String?;
   final debug = args['debug'] == true;
+  final skipDefaults = args['no-defaults'] == true;
 
   final outPath = path.normalize(path.absolute(out));
   final outDir = Directory(outPath);
@@ -94,12 +105,25 @@ Future<void> main(List<String> arguments) async {
 
   try {
     final builder = MarionetteBuilder(root: name);
+
+    // Generate Dart code
     final result = builder.generate(data);
+    final dartOutputFile = File(path.join(outPath, '${name.snakeCase}.g.dart'));
+    await dartOutputFile.writeAsString(result);
+    print('Generated: ${dartOutputFile.path}');
 
-    final outputFile = File(path.join(outPath, '${name.snakeCase}.g.dart'));
-    await outputFile.writeAsString(result);
+    // Generate defaults JSON by default (unless disabled)
+    if (!skipDefaults) {
+      final defaults = builder.extractDefaults(data);
+      final encoder = JsonEncoder.withIndent('  ');
+      final defaultsJson = encoder.convert(defaults);
 
-    print('Generated: ${outputFile.path}');
+      final defaultsOutputFile = File(
+        path.join(outPath, '${name.snakeCase}_defaults.g.json'),
+      );
+      await defaultsOutputFile.writeAsString(defaultsJson);
+      print('Generated defaults: ${defaultsOutputFile.path}');
+    }
 
     // Save debug file if requested
     if (debug && rawJsonContent != null) {
