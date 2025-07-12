@@ -1,6 +1,6 @@
 name: marionette
 description: A Dart code generation library that creates type-safe classes from Firebase Remote Config default files.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/1qlabs/marionette
 
 environment:
