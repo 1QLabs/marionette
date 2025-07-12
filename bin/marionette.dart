@@ -28,7 +28,7 @@ Future<void> main(List<String> arguments) async {
     'debug',
     help: 'Save the remote config template to output directory',
   );
-  parser.addFlag('no-defaults', help: 'Skip generating the defaults JSON file');
+  parser.addFlag('no-defaults', help: 'Skip generating the defaults Dart file');
 
   ArgResults args;
   try {
@@ -42,9 +42,7 @@ Future<void> main(List<String> arguments) async {
   if (args['help'] == true) {
     print('Usage: marionette [output_directory] [options]');
     print('');
-    print(
-      'Generate Dart code and defaults JSON from Firebase Remote Config data.',
-    );
+    print('Generate Dart code and defaults from Firebase Remote Config data.');
     print('');
     print('Arguments:');
     print(
@@ -55,10 +53,10 @@ Future<void> main(List<String> arguments) async {
     print(parser.usage);
     print('');
     print('Examples:');
-    print('  # Generate both Dart code and defaults JSON');
+    print('  # Generate both Dart code and defaults');
     print('  marionette --template config.json lib/');
     print('');
-    print('  # Generate only Dart code (skip defaults JSON)');
+    print('  # Generate only Dart code (skip defaults)');
     print('  marionette --template config.json --no-defaults lib/');
     return;
   }
@@ -112,16 +110,15 @@ Future<void> main(List<String> arguments) async {
     await dartOutputFile.writeAsString(result);
     print('Generated: ${dartOutputFile.path}');
 
-    // Generate defaults JSON by default (unless disabled)
+    // Generate defaults Dart file by default (unless disabled)
     if (!skipDefaults) {
       final defaults = builder.extractDefaults(data);
-      final encoder = JsonEncoder.withIndent('  ');
-      final defaultsJson = encoder.convert(defaults);
+      final defaultsDart = builder.generateDefaultsFile(name, defaults);
 
       final defaultsOutputFile = File(
-        path.join(outPath, '${name.snakeCase}_defaults.g.json'),
+        path.join(outPath, '${name.snakeCase}_defaults.g.dart'),
       );
-      await defaultsOutputFile.writeAsString(defaultsJson);
+      await defaultsOutputFile.writeAsString(defaultsDart);
       print('Generated defaults: ${defaultsOutputFile.path}');
     }
 
