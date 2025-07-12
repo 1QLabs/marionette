@@ -10,6 +10,45 @@ A Dart code generation library that creates type-safe classes from Firebase Remo
 - **Command-line interface**: Easy-to-use CLI tool for code generation from Firebase Remote Config schemas
 - **Clean code output**: Generates well-formatted, readable Dart code with proper class structure
 
+## Development Scripts
+
+The project includes several npm-style scripts defined in `pubspec.yaml`:
+
+```bash
+# Generate code from example config (prints to stdout)
+dart run --enable-experiment=native-assets scripts:generate
+
+# Test code generation with validation (recommended)
+dart run scripts/test_generation.dart
+
+# Generate and save to specific output file
+dart run bin/marionette.dart --template test/example_config.json --name ExampleConfig example_output.dart
+
+# Clean generated files
+rm -f example_output.dart example_generated.dart *.g.dart
+
+# Run linting
+dart analyze
+
+# Format code
+dart format lib/ bin/ scripts/
+
+# Run all checks (format, lint, test-generate)
+dart format lib/ bin/ scripts/ && dart analyze && dart run scripts/test_generation.dart
+```
+
+### Testing Code Generation
+
+The `scripts/test_generation.dart` script provides comprehensive validation:
+
+- ✅ Loads and parses the example Firebase Remote Config
+- ✅ Generates Dart code using MarionetteBuilder
+- ✅ Validates syntax using DartFormatter
+- ✅ Checks code structure and balance
+- ✅ Saves output for inspection
+
+This is much more robust than string-based testing as it actually parses the generated Dart code and validates it's syntactically correct.
+
 ## Usage
 
 ### Command Line

@@ -1,0 +1,177 @@
+{
+  "parameters": {
+    "app_name": {
+      "defaultValue": {
+        "value": "My Awesome App"
+      },
+      "valueType": "STRING"
+    },
+    "api_endpoint": {
+      "defaultValue": {
+        "value": "https://api.example.com/v1"
+      },
+      "valueType": "STRING"
+    },
+    "welcome_message": {
+      "defaultValue": {
+        "value": "Welcome to {app_name}! You have {count} new messages."
+      },
+      "valueType": "STRING"
+    },
+    "multiline_text": {
+      "defaultValue": {
+        "value": "Line 1\\nLine 2\\nLine 3"
+      },
+      "valueType": "STRING"
+    },
+    "is_feature_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN"
+    },
+    "debug_mode": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "valueType": "BOOLEAN"
+    },
+    "max_retry_count": {
+      "defaultValue": {
+        "value": "5"
+      },
+      "valueType": "NUMBER"
+    },
+    "timeout_seconds": {
+      "defaultValue": {
+        "value": "30"
+      },
+      "valueType": "NUMBER"
+    },
+    "price_multiplier": {
+      "defaultValue": {
+        "value": "1.25"
+      },
+      "valueType": "NUMBER"
+    },
+    "api_rate_limit": {
+      "defaultValue": {
+        "value": "100.5"
+      },
+      "valueType": "NUMBER"
+    },
+    "user_config": {
+      "defaultValue": {
+        "value": "{\"theme\": \"dark\", \"notifications\": true, \"language\": \"en\"}"
+      },
+      "valueType": "JSON"
+    },
+    "feature_flags": {
+      "defaultValue": {
+        "value": "{\"new_ui\": true, \"beta_features\": false, \"analytics\": true}"
+      },
+      "valueType": "JSON"
+    },
+    "server_config": {
+      "defaultValue": {
+        "value": "{\"host\": \"localhost\", \"port\": 8080, \"ssl\": false}"
+      },
+      "valueType": "JSON"
+    }
+  },
+  "parameterGroups": {
+    "ui_settings": {
+      "parameters": {
+        "group_ui_theme": {
+          "defaultValue": {
+            "value": "light"
+          },
+          "valueType": "STRING"
+        },
+        "group_ui_show_tooltips": {
+          "defaultValue": {
+            "value": "true"
+          },
+          "valueType": "BOOLEAN"
+        },
+        "group_ui_animation_duration": {
+          "defaultValue": {
+            "value": "300"
+          },
+          "valueType": "NUMBER"
+        },
+        "group_ui_custom_styles": {
+          "defaultValue": {
+            "value": "{\"primary_color\": \"#007AFF\", \"secondary_color\": \"#34C759\"}"
+          },
+          "valueType": "JSON"
+        }
+      }
+    },
+    "analytics_config": {
+      "parameters": {
+        "group_analytics_enabled": {
+          "defaultValue": {
+            "value": "true"
+          },
+          "valueType": "BOOLEAN"
+        },
+        "group_analytics_sample_rate": {
+          "defaultValue": {
+            "value": "0.1"
+          },
+          "valueType": "NUMBER"
+        },
+        "group_analytics_events": {
+          "defaultValue": {
+            "value": "{\"page_view\": true, \"click\": true, \"scroll\": false}"
+          },
+          "valueType": "JSON"
+        }
+      }
+    },
+    "notification_settings": {
+      "parameters": {
+        "group_notification_push_enabled": {
+          "defaultValue": {
+            "value": "true"
+          },
+          "valueType": "BOOLEAN"
+        },
+        "group_notification_email_enabled": {
+          "defaultValue": {
+            "value": "false"
+          },
+          "valueType": "BOOLEAN"
+        },
+        "group_notification_frequency": {
+          "defaultValue": {
+            "value": "daily"
+          },
+          "valueType": "STRING"
+        },
+        "group_notification_max_per_day": {
+          "defaultValue": {
+            "value": "10"
+          },
+          "valueType": "NUMBER"
+        },
+        "group_notification_template": {
+          "defaultValue": {
+            "value": "Hello {user_name}, you have {count} new notifications!"
+          },
+          "valueType": "STRING"
+        }
+      }
+    }
+  },
+  "version": {
+    "versionNumber": "1",
+    "updateTime": "2024-01-15T10:30:00.000Z",
+    "updateUser": {
+      "email": "developer@example.com"
+    },
+    "updateOrigin": "CONSOLE",
+    "updateType": "INCREMENTAL_UPDATE"
+  }
+}
