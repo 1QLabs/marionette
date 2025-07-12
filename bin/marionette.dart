@@ -174,10 +174,11 @@ Future<Map<String, dynamic>> _fetchRemoteConfig(String? versionNumber) async {
     print('PATH: ${Platform.environment['PATH']}');
     print('Firebase command: firebase ${args.join(' ')}');
 
-    final result = await Process.run('sh', [
-      '-c',
-      'firebase ${args.join(' ')}',
-    ], environment: Platform.environment);
+    final result = await Process.run(
+      'firebase',
+      args,
+      environment: Platform.environment,
+    );
 
     print('Firebase CLI exit code: ${result.exitCode}');
     print('Firebase CLI stdout: ${result.stdout}');
