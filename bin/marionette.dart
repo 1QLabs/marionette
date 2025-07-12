@@ -20,6 +20,10 @@ Future<void> main(List<String> arguments) async {
     'version-number',
     help: 'Version number of the remote config template to fetch',
   );
+  parser.addOption(
+    'project',
+    help: 'Firebase project ID to fetch remote config from',
+  );
   parser.addFlag(
     'debug',
     help: 'Save the remote config template to output directory',
@@ -53,6 +57,7 @@ Future<void> main(List<String> arguments) async {
   final name = args[nameArg] as String? ?? "RemoteConfig";
   final templatePath = args['template'] as String?;
   final versionNumber = args['version-number'] as String?;
+  final projectId = args['project'] as String?;
   final debug = args['debug'] == true;
 
   final outPath = path.normalize(path.absolute(out));
@@ -78,7 +83,7 @@ Future<void> main(List<String> arguments) async {
       rawJsonContent = result['rawContent'] as String?;
     } else {
       // Check for Firebase CLI and fetch remote config
-      final result = await _fetchRemoteConfig(versionNumber);
+      final result = await _fetchRemoteConfig(versionNumber, projectId);
       data = result['data'] as Map<String, dynamic>;
       rawJsonContent = result['rawContent'] as String?;
     }
@@ -126,7 +131,10 @@ Future<Map<String, dynamic>> _loadLocalTemplate(String templatePath) async {
   }
 }
 
-Future<Map<String, dynamic>> _fetchRemoteConfig(String? versionNumber) async {
+Future<Map<String, dynamic>> _fetchRemoteConfig(
+  String? versionNumber,
+  String? projectId,
+) async {
   // Check if Firebase CLI is installed
   try {
     final result = await Process.run('firebase', ['--version']);
@@ -168,6 +176,10 @@ Future<Map<String, dynamic>> _fetchRemoteConfig(String? versionNumber) async {
     if (versionNumber != null) {
       args.add('--version-number');
       args.add(versionNumber);
+    }
+    if (projectId != null) {
+      args.add('--project');
+      args.add(projectId);
     }
 
     print('Current working directory: ${Directory.current.path}');
