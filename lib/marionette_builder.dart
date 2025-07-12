@@ -295,20 +295,41 @@ class MarionetteBuilder {
       '${ReCase(root).pascalCase}${ReCase(key).pascalCase}';
 
   /// Extracts default values from Remote Config JSON and returns a simplified map
-  /// with parameter names as keys and their default values with proper types.
-  Map<String, dynamic> extractDefaults(Map<String, dynamic> json) {
-    final simplified = _simplify(json);
-    final result = <String, dynamic>{};
+  /// with parameter names as keys and their default values as string values.
+  Map<String, String> extractDefaults(Map<String, dynamic> json) {
+    final result = <String, String>{};
+    final params = json['parameters'] as Map<String, dynamic>? ?? {};
+    final groups = json['parameterGroups'] as Map<String, dynamic>? ?? {};
 
-    for (var entry in simplified.entries) {
-      result[entry.key] = entry.value;
+    // Process regular parameters
+    for (var entry in params.entries) {
+      final defaultValue =
+          entry.value['defaultValue']?['value']?.toString() ?? '';
+      result[entry.key] = defaultValue;
+    }
+
+    // Process parameter groups
+    for (var group in groups.entries) {
+      final groupParams = group.value['parameters'] as Map<String, dynamic>?;
+      if (groupParams != null) {
+        for (var entry in groupParams.entries) {
+          final defaultValue =
+              entry.value['defaultValue']?['value']?.toString() ?? '';
+          // For grouped parameters, use the cleaned parameter name (removing group_ prefix)
+          final paramName =
+              entry.key.startsWith('group_')
+                  ? entry.key.substring(6) // Remove 'group_' prefix
+                  : entry.key;
+          result[paramName] = defaultValue;
+        }
+      }
     }
 
     return result;
   }
 
-  /// Generates a Dart file containing a Map<String, dynamic> with default values
-  String generateDefaultsFile(String className, Map<String, dynamic> defaults) {
+  /// Generates a Dart file containing a Map<String, String> with default values
+  String generateDefaultsFile(String className, Map<String, String> defaults) {
     final buffer = StringBuffer();
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
     buffer.writeln('// This file was generated using Marionette');
@@ -316,15 +337,15 @@ class MarionetteBuilder {
     buffer.writeln(
       '/// Default values for ${className} Remote Config parameters',
     );
-    buffer.writeln('const Map<String, dynamic> remoteConfigDefaults = {');
+    buffer.writeln('const Map<String, String> remoteConfigDefaults = {');
 
     for (var entry in defaults.entries) {
       final key = entry.key;
       final value = entry.value;
 
-      // Convert value to proper Dart literal
-      final dartValue = _convertToDartLiteral(value);
-      buffer.writeln('  \'$key\': $dartValue,');
+      // Escape the value for Dart string literal
+      final escapedValue = _escapeStringForDart(value);
+      buffer.writeln('  \'$key\': \'$escapedValue\',');
     }
 
     buffer.writeln('};');
@@ -334,26 +355,13 @@ class MarionetteBuilder {
     return _formatter.format(result);
   }
 
-  /// Converts a value to its proper Dart literal representation
-  String _convertToDartLiteral(dynamic value) {
-    if (value is bool) {
-      return value.toString();
-    } else if (value is int) {
-      return value.toString();
-    } else if (value is double) {
-      return value.toString();
-    } else if (value is String) {
-      // Escape the string for Dart string literal
-      final escapedValue = value
-          .replaceAll('\\', '\\\\') // Escape backslashes first
-          .replaceAll('\'', '\\\'') // Escape single quotes
-          .replaceAll('\n', '\\n') // Escape newlines
-          .replaceAll('\r', '\\r') // Escape carriage returns
-          .replaceAll('\t', '\\t'); // Escape tabs
-      return '\'$escapedValue\'';
-    } else {
-      // Fallback to string representation
-      return '\'${value.toString()}\'';
-    }
+  /// Escapes a string value for use in a Dart string literal
+  String _escapeStringForDart(String value) {
+    return value
+        .replaceAll('\\', '\\\\') // Escape backslashes first
+        .replaceAll('\'', '\\\'') // Escape single quotes
+        .replaceAll('\n', '\\n') // Escape newlines
+        .replaceAll('\r', '\\r') // Escape carriage returns
+        .replaceAll('\t', '\\t'); // Escape tabs
   }
 }

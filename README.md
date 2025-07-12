@@ -7,7 +7,7 @@ A Dart code generation library that creates type-safe classes from Firebase Remo
 - **Type-safe Firebase Remote Config access**: Generate Dart classes with strongly-typed getters for Remote Config parameters (strings, booleans, numbers)
 - **Hierarchical structure**: Organize Remote Config parameters into nested groups with corresponding class hierarchies
 - **String interpolation**: Built-in support for parameterized Remote Config strings with runtime value substitution
-- **Defaults Dart file generation**: Automatically generates a Dart file with a Map<String, dynamic> containing all parameter names and their default values
+- **Defaults Dart file generation**: Automatically generates a Dart file with a Map<String, String> containing all parameter names and their default values
 - **Command-line interface**: Easy-to-use CLI tool for code generation from Firebase Remote Config schemas
 - **Clean code output**: Generates well-formatted, readable Dart code with proper class structure
 
@@ -107,19 +107,19 @@ class FirebaseRemoteConfigUi extends Marionette {
 
 ### Generated Defaults Dart File
 
-Marionette also generates a Dart file containing a `Map<String, dynamic>` with all parameter names and their default values:
+Marionette also generates a Dart file containing a `Map<String, String>` with all parameter names and their default values:
 
 ```dart
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // This file was generated using Marionette
 
 /// Default values for FirebaseRemoteConfig Remote Config parameters
-const Map<String, dynamic> remoteConfigDefaults = {
+const Map<String, String> remoteConfigDefaults = {
   'app_name': 'My App',
-  'debug_mode': true,
+  'debug_mode': 'true',
   'welcome_message': 'Welcome, {username}!',
-  'max_retry_count': 5,
-  'timeout_seconds': 30.0,
+  'max_retry_count': '5',
+  'timeout_seconds': '30.0',
 };
 ```
 
