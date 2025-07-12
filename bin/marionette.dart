@@ -153,18 +153,49 @@ Future<Map<String, dynamic>> _fetchRemoteConfig(String? versionNumber) async {
   final tempDir = await Directory.systemTemp.createTemp('marionette_');
   final tempFile = File(path.join(tempDir.path, 'remote_config.json'));
 
+  print('Created temp directory: ${tempDir.path}');
+  print('Temp file path: ${tempFile.path}');
+  print('Temp directory exists: ${await tempDir.exists()}');
+
   try {
+    // Ensure temp directory exists and is writable
+    if (!await tempDir.exists()) {
+      await tempDir.create(recursive: true);
+    }
+
     // Fetch remote config template
     final args = ['remoteconfig:get', '--output', tempFile.path];
     if (versionNumber != null) {
       args.add('--version-number');
       args.add(versionNumber);
     }
-    final result = await Process.run('firebase', args);
+
+    print('Current working directory: ${Directory.current.path}');
+    print('PATH: ${Platform.environment['PATH']}');
+    print('Firebase command: firebase ${args.join(' ')}');
+
+    final result = await Process.run('sh', [
+      '-c',
+      'firebase ${args.join(' ')}',
+    ], environment: Platform.environment);
+
+    print('Firebase CLI exit code: ${result.exitCode}');
+    print('Firebase CLI stdout: ${result.stdout}');
+    print('Firebase CLI stderr: ${result.stderr}');
 
     if (result.exitCode != 0) {
       throw Exception('Failed to fetch remote config: ${result.stderr}');
     }
+
+    // Check if the output file was created
+    if (!await tempFile.exists()) {
+      throw Exception(
+        'Firebase CLI succeeded but output file was not created: ${tempFile.path}',
+      );
+    }
+
+    print('Output file exists: ${await tempFile.exists()}');
+    print('Output file size: ${await tempFile.length()} bytes');
 
     // Read and parse the fetched data
     final jsonContent = await tempFile.readAsString();
